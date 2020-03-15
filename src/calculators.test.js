@@ -23,6 +23,6 @@ describe('Time calculator',()=>{
 
 describe('Deadline calculator', ()=>{
     it('should return formatted deadline date', function () {
-        expect(deadlineCalculator(60, 'March 13, 2020 13:00:00')).toBe('13/03/2020 14:00')
+        expect(deadlineCalculator(60, new Date('March 13, 2020 13:00:00'))).toBe('13/03/2020 14:00')
     });
 });
