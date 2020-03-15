@@ -1,9 +1,10 @@
 import React from "react";
 import {Col, Container, Form, FormControl, InputGroup, Row} from "react-bootstrap";
 import {languages} from "./calculators";
+import PropTypes from 'prop-types';
 import './App.css'
 
-export default function FormComponent({onChangeHandler, setTextLength, setLanguage, price, time}) {
+function FormComponent({onChangeHandler, setTextLength, setLanguage, price, time}) {
     return (
         <Container>
             <Row>
@@ -61,3 +62,18 @@ export default function FormComponent({onChangeHandler, setTextLength, setLangua
         </Container>
     )
 }
+
+FormComponent.propTypes = {
+    onChangeHandler: PropTypes.func.isRequired,
+    setTextLength: PropTypes.func.isRequired,
+    setLanguage: PropTypes.func.isRequired,
+    price: PropTypes.number.isRequired,
+    time: PropTypes.string.isRequired
+};
+
+FormComponent.defaultProps = {
+    price: 0,
+    time: ''
+};
+
+export default FormComponent;
