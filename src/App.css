@@ -21,6 +21,11 @@ form {
     flex-direction: column;
     justify-content: space-around;
 }
+
+.form-control {
+    border-color: #007bff;
+}
+
 .col-sm-10 {
     display: flex;
     justify-content: space-evenly;
@@ -28,30 +33,35 @@ form {
     flex-direction: column;
 }
 
-.radioButtons {
-    display: flex;
-    width: 70%;
-    justify-content: space-evenly;
+.btn-outline-primary, .btn-primary {
+    border-radius: 0;
+}
+
+
+.btn-group {
+    width: 100%;
 }
 
 .radioInputGroup {
-    align-items: baseline;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
+    flex-wrap: nowrap;
 }
 
-.input-group-prepend{
+.input-group-prepend {
     height: 100%;
 }
 
-.form-check{
+.form-check {
     display: inline-block;
 }
 
-label{
+label {
     cursor: pointer;
 }
 
 .price {
     font-size: 30px;
+}
+
+.time {
+    min-height: 1.5em;
 }

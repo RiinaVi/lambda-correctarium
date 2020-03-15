@@ -1,10 +1,10 @@
 import React from "react";
-import {Col, Container, Form, FormControl, InputGroup, Row} from "react-bootstrap";
+import {Col, Container, Form, FormControl, InputGroup, Row, ButtonGroup, Button} from "react-bootstrap";
 import {languages} from "./calculators";
 import PropTypes from 'prop-types';
 import './App.css'
 
-function FormComponent({onChangeHandler, setTextLength, setLanguage, price, time}) {
+function FormComponent({onChangeHandler, setTextLength, setLanguage, language, price, time}) {
     return (
         <Container>
             <Row>
@@ -26,24 +26,19 @@ function FormComponent({onChangeHandler, setTextLength, setLanguage, price, time
                         <InputGroup.Prepend>
                             <InputGroup.Text>Select the language</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <div className={'radioButtons'}>
+
+                        <ButtonGroup aria-label="Basic example">
                             {languages.map((lang, index) => {
                                 return (
-                                    <div key={index}>
-                                        <input
-                                            type="radio"
-                                            id={'radio' + index}
-                                            name="formHorizontalRadios"
-                                            defaultChecked={true}
+                                    <Button variant={language === lang ? 'primary' : "outline-primary"}
+                                            key={index}
                                             value={lang}
                                             onClick={e => onChangeHandler(setLanguage, e.target.value)}
                                             onFocus={e => onChangeHandler(setLanguage, e.target.value)}
-                                        />
-                                        <label key={index} htmlFor={'radio' + index}>{lang}</label>
-                                    </div>
+                                    >{lang}</Button>
                                 )
                             })}
-                        </div>
+                        </ButtonGroup>
                     </InputGroup>
                     <Form.Group as={Row}>
                         <Col sm={{span: 10}}>
@@ -52,8 +47,7 @@ function FormComponent({onChangeHandler, setTextLength, setLanguage, price, time
                             </Row>
                             <Row>
                                 <div className='time'
-                                     hidden={!price}
-                                >Text will be ready on {time}</div>
+                                ><span hidden={!price}>Text will be ready on {time} </span></div>
                             </Row>
                         </Col>
                     </Form.Group>
@@ -67,11 +61,13 @@ FormComponent.propTypes = {
     onChangeHandler: PropTypes.func.isRequired,
     setTextLength: PropTypes.func.isRequired,
     setLanguage: PropTypes.func.isRequired,
+    language: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     time: PropTypes.string.isRequired
 };
 
 FormComponent.defaultProps = {
+    language: '',
     price: 0,
     time: ''
 };

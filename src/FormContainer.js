@@ -23,6 +23,7 @@ export default function FormContainer() {
             onChangeHandler={onChangeHandler}
             setTextLength={setTextLength}
             setLanguage={setLanguage}
+            language={language}
             price={price}
             time={time}
         />
