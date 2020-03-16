@@ -4,7 +4,7 @@ import {languages} from "./calculators";
 import PropTypes from 'prop-types';
 import './App.css'
 
-function FormComponent({onChangeHandler, setTextLength, setLanguage, language, price, time}) {
+function FormComponent({onChangeHandler, setTextLength, textLength, setLanguage, language, price, time}) {
     return (
         <Container>
             <Row>
@@ -22,11 +22,11 @@ function FormComponent({onChangeHandler, setTextLength, setLanguage, language, p
                             rows='5'
                             aria-label="With textarea"/>
                     </InputGroup>
+                    <Row className={'textLength'}>{textLength}</Row>
                     <InputGroup className={'radioInputGroup'}>
                         <InputGroup.Prepend>
                             <InputGroup.Text>Select the language</InputGroup.Text>
                         </InputGroup.Prepend>
-
                         <ButtonGroup aria-label="Basic example">
                             {languages.map((lang, index) => {
                                 return (
@@ -60,6 +60,7 @@ function FormComponent({onChangeHandler, setTextLength, setLanguage, language, p
 FormComponent.propTypes = {
     onChangeHandler: PropTypes.func.isRequired,
     setTextLength: PropTypes.func.isRequired,
+    textLength: PropTypes.number.isRequired,
     setLanguage: PropTypes.func.isRequired,
     language: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
@@ -67,6 +68,7 @@ FormComponent.propTypes = {
 };
 
 FormComponent.defaultProps = {
+    textLength: 0,
     language: '',
     price: 0,
     time: ''

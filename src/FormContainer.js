@@ -22,6 +22,7 @@ export default function FormContainer() {
         <FormComponent
             onChangeHandler={onChangeHandler}
             setTextLength={setTextLength}
+            textLength={textLength}
             setLanguage={setLanguage}
             language={language}
             price={price}

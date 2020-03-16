@@ -9,6 +9,7 @@
     margin-top: 100px;
 }
 
+
 .row {
     width: 100%;
     justify-content: center;
@@ -56,6 +57,13 @@ form {
 
 label {
     cursor: pointer;
+}
+
+.textLength {
+    justify-content: flex-start;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    color: #607D8B;
 }
 
 .price {
