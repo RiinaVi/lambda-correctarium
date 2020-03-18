@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {deadlineCalculator, priceCalculator, timeCalculator} from "./calculators";
+import {calculateDeadline, calculatePrice, calculateTime} from "./calculators";
 import FormComponent from "./FormComponent";
 
 
@@ -14,8 +14,8 @@ export default function FormContainer() {
     }
 
     useEffect(()=>{
-        setPrice(priceCalculator(textLength, language));
-        setTime(deadlineCalculator(timeCalculator(textLength, language)))
+        setPrice(calculatePrice(textLength, language));
+        setTime(calculateDeadline(calculateTime(textLength, language)))
     }, [textLength, language]);
 
     return(

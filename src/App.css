@@ -47,7 +47,7 @@ form {
     flex-wrap: nowrap;
 }
 
-.input-group-prepend {
+.input-group-prepend , .input-group-text{
     height: 100%;
 }
 

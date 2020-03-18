@@ -1,46 +1,63 @@
-import {deadlineCalculator, timeCalculator, priceCalculator} from "./calculators";
+import {calculateDeadline, calculateTime, calculatePrice} from "./calculators";
+import moment from "moment";
 
 describe('Price calculator', () => {
-    it('should return 0 if the input string is empty', () => {
-        expect(priceCalculator(0, 'Ukrainian')).toBe(0)
-    });
-    it('should return 50 if language is Ukrainian/Russian and string length is less than 1000', () => {
-        expect(priceCalculator(100, 'Russian')).toBe(50);
-        expect(priceCalculator(100, 'Ukrainian')).toBe(50)
-    });
-    it('should return 120 if language is English and string length is less than 1000', () => {
-        expect(priceCalculator(200, 'English')).toBe(120)
-    });
-    it('should return valid price if there are more than 1000 characters', () => {
-        expect(priceCalculator(2000, 'Russian')).toBe(100);
-        expect(priceCalculator(4000, 'Ukrainian')).toBe(200);
-        expect(priceCalculator(6000, 'English')).toBe(720);
+    it.each
+        ` textLength |   language   | result
+             ${0}    |${'Russian'}  | ${0}
+             ${0}    |${'English'}  | ${0}
+             ${0}    |${'Ukrainian'}| ${0}
+             ${100}  |${'Russian'}  | ${50}
+             ${200}  |${'Ukrainian'}| ${50}
+             ${300}  |${'English'}  | ${120}
+            ${2000}  |${'Russian'}  | ${100}
+            ${4000}  |${'Ukrainian'}  | ${200}
+            ${6000}  |${'English'}  | ${720}
+    `('returns $result UAH if text length - $textLength and language - $language',
+        ({textLength, language, result}) => {
+        expect(calculatePrice(textLength, language)).toBe(result);
     });
 });
 
 describe('Time calculator', () => {
-    it('should return 60 minutes if language is Ukrainian/Russian and string length is less than 1333', () => {
-        expect(timeCalculator(1000, 'Russian')).toBe(60);
-        expect(timeCalculator(1000, 'Ukrainian')).toBe(60)
-    });
-    it('should return 60 minutes if language is English and string length is less than 333', () => {
-        expect(timeCalculator(300, 'English')).toBe(60)
-    });
-    it('should return valid working time', () => {
-        expect(timeCalculator(2000, 'Russian')).toBe(121);
-        expect(timeCalculator(4000, 'English')).toBe(751);
-    });
+    it.each
+        ` textLength |   language   | result
+            ${1000}  |${'Russian'}  | ${60}
+            ${300}   |${'English'}  | ${60}
+            ${1300}  |${'Ukrainian'}| ${60}
+            ${2000}  |${'Russian'}  | ${121}
+            ${1333}  |${'Ukrainian'}| ${60}
+            ${1334}  |${'Ukrainian'}| ${91}
+            ${4000}  |${'English'}  | ${751}
+    `('returns $result minutes if text length - $textLength and language - $language',
+        ({textLength, language, result}) => {
+            expect(calculateTime(textLength, language)).toBe(result);
+        });
+
 });
 
 describe('Deadline calculator', () => {
-    it('should return formatted deadline date',  () => {
-        expect(deadlineCalculator(60, new Date('March 13, 2020 13:00'))).toBe('13/03/2020 14:00')
-    });
-    it('should return valid deadline counting weekends',  () => {
-        expect(deadlineCalculator(120, new Date('March 13, 2020 18:00'))).toBe('16/03/2020 11:00');
-        expect(deadlineCalculator(240, new Date('March 13, 2020 19:00'))).toBe('16/03/2020 14:00');
-        expect(deadlineCalculator(90, new Date('March 14, 2020 19:00'))).toBe('16/03/2020 11:30');
-        expect(deadlineCalculator(540, new Date('March 15, 2020 19:00'))).toBe('16/03/2020 19:00');
-        expect(deadlineCalculator(1740, new Date('March 11, 2020 18:30'))).toBe('17/03/2020 11:30');
-    });
+
+    it.each
+    `        orderDate               |  timeForWork  |          result
+    ${'23/09/2019, 10:00 Monday'}    | ${5}          | ${'23/09/2019, 15:00 Monday'}
+    ${'23/09/2019, 18:00 Monday'}    | ${7}          | ${'24/09/2019, 16:00 Tuesday'}
+    ${'23/09/2019, 18:00 Monday'}    | ${25}         | ${'26/09/2019, 16:00 Thursday'}
+    ${'21/09/2019, 15:00 Saturday'}  | ${7}          | ${'23/09/2019, 17:00 Monday'}
+    ${'20/09/2019, 17:00 Friday'}    | ${60}         | ${'01/10/2019, 14:00 Tuesday'}
+    ${'21/09/2019, 17:00 Saturday'}  | ${60}         | ${'01/10/2019, 16:00 Tuesday'}
+    ${'24/09/2019, 08:00 Tuesday'}   | ${8}          | ${'24/09/2019, 18:00 Tuesday'}
+    ${'25/09/2019, 08:00 Wednesday'} | ${8}          | ${'25/09/2019, 18:00 Wednesday'}
+    ${'25/09/2019, 18:00 Wednesday'} | ${8}          | ${'26/09/2019, 17:00 Thursday'}
+    ${'25/09/2019, 19:00 Wednesday'} | ${8}          | ${'26/09/2019, 18:00 Thursday'}
+    ${'25/09/2019, 18:45 Wednesday'} | ${8}          | ${'26/09/2019, 17:45 Thursday'}
+    ${'25/09/2019, 19:10 Wednesday'} | ${8}          | ${'26/09/2019, 18:00 Thursday'}
+    ${'27/09/2019, 17:00 Friday'}    | ${8}          | ${'30/09/2019, 16:00 Monday'}
+    ${'27/09/2019, 19:00 Friday'}    | ${8}          | ${'30/09/2019, 18:00 Monday'}
+    ${'28/09/2019, 10:00 Saturday'}  | ${8}          | ${'30/09/2019, 18:00 Monday'}`
+    ('returns $result if order date is - $orderDate and time for work in hours - $timeForWork',
+        ({orderDate, timeForWork, result}) => {
+                expect(calculateDeadline(timeForWork*60,
+                    moment(orderDate, 'DD/MM/YYYY, HH:mm dddd'))).toBe(result)
+        })
 });

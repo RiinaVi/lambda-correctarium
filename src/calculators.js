@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from "moment-timezone";
 
 export const languages = [
     'Russian', 'English', 'Ukrainian'
@@ -20,10 +20,14 @@ const startOfWork = 10;
 const endOfWork = 19;
 
 function formatDate(date) {
-    return moment(date).format('DD/MM/YYYY HH:mm')
+    return date.format('DD/MM/YYYY, HH:mm dddd')
 }
 
-export function priceCalculator(textLength, lang) {
+moment.fn.resetDate = function (hours = startOfWork) {
+    return this.hours(hours).minutes(0)
+};
+
+export function calculatePrice(textLength, lang) {
     if (!textLength) return 0;
     const priceForOneSymbol = allPricesForSymbol[lang];
     const minimumPrice = priceForOneSymbol * 1000;
@@ -31,7 +35,7 @@ export function priceCalculator(textLength, lang) {
     return price >= minimumPrice ? price : minimumPrice;
 }
 
-export function timeCalculator(textLength, lang) {
+export function calculateTime(textLength, lang) {
     const minimumTime = 60;
     const symbolsPerHour = allSymbolsPerHour[lang];
     if (textLength <= symbolsPerHour) return minimumTime;
@@ -40,30 +44,38 @@ export function timeCalculator(textLength, lang) {
     return 30 + Math.ceil(textLength / symbolPerMinute);
 }
 
-export function deadlineCalculator(timeForWork, orderTime = new Date()) {
+export function calculateDeadline(timeForWorkInMinutes, orderDate = moment()) {
+    moment.tz.setDefault('Europe/Kiev');
 
-    orderTime = toNextWorkingMoment(orderTime);
-    const timeToEnd = moment.duration(moment(orderTime).hours(endOfWork).minutes(0).diff(orderTime)).asMinutes();
+    const userTimeZone = moment.tz.guess();
+    let startDate = orderDate;
 
-    if (timeToEnd >= timeForWork) {
-        return formatDate(moment(orderTime).add(timeForWork, 'minutes'));
+    while (timeForWorkInMinutes){
+        startDate = convertToNextWorkingDate(startDate);
+
+        const timeToEnd = moment.duration(moment(startDate).resetDate(endOfWork).diff(startDate)).asMinutes();
+
+        if (timeToEnd >= timeForWorkInMinutes) {
+            return formatDate(startDate.add(timeForWorkInMinutes, 'minutes').tz(userTimeZone));
+        }
+
+        startDate = startDate.add(timeToEnd, 'minutes');
+        timeForWorkInMinutes-=timeToEnd
     }
-
-    orderTime = moment(orderTime).add(timeToEnd, 'minutes');
-    return deadlineCalculator(timeForWork - timeToEnd, orderTime)
 }
 
 
-function toNextWorkingMoment(orderTime) {
+function convertToNextWorkingDate(date) {
 
-    const isAfterFinish = moment(orderTime).isSameOrAfter(moment(orderTime).hours(endOfWork).minutes(0));
-    const isBeforeStart = moment(orderTime).isBefore(moment(orderTime).hours(startOfWork).minutes(0));
-    const isFriday = moment(orderTime).day() === 5;
-    const isSaturday = moment(orderTime).day() === 6;
-    const isSunday = moment(orderTime).day() === 0;
+    const isAfterFinish = date.isSameOrAfter(moment(date).resetDate(endOfWork));
+    const isBeforeStart = date.isBefore(moment(date).resetDate());
+    const isFriday = date.day() === 5;
+    const isSaturday = date.day() === 6;
+    const isSunday = date.day() === 0;
+
 
     function addDays(days) {
-        return moment(orderTime).add(days, 'days').hours(startOfWork).minutes(0)
+        return date.add(days, 'days').resetDate()
     }
 
     if (isFriday && isAfterFinish) {
@@ -74,7 +86,11 @@ function toNextWorkingMoment(orderTime) {
         return addDays(2)
     }
 
-    if (isAfterFinish || isSunday) {
+    if (isSunday) {
+        return addDays(1)
+    }
+
+    if (isAfterFinish) {
         return addDays(1)
     }
 
@@ -82,6 +98,6 @@ function toNextWorkingMoment(orderTime) {
         return addDays(0)
     }
 
-    return orderTime
+    return date
 }
 
